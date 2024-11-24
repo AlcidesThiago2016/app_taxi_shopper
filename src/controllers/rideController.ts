@@ -13,7 +13,7 @@ const calTripCost = (distance: number): number => {
     return baseFare + distance * perKm;
 };
 
-export const calcTrip = (req: any, res: any): void => {
+export const estimateRide = (req: any, res: any): void => {
     const { origin, destination } = req.body;
 
     if (!origin || !destination) {

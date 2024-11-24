@@ -5,6 +5,6 @@ const app: Application = express();
 
 app.use(express.json());
 
-app.use('/trips', tripRoutes);
+app.use('/ride', tripRoutes);
 
 export default app;
