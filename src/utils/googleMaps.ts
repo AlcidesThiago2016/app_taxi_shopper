@@ -8,16 +8,16 @@ export const getDistanceGoogleMaps = async (
     apiKey: string
 ): Promise<number> => {
     try {
-        const response = await client.distancematrix({
+        const response = await client.directions({
             params: {
-                origins: [origin],
-                destinations: [destination],
+                origin,
+                destination,
                 key: apiKey,
             },
         });
 
         const distanceMeters = 
-            response.data.rows[0]?.elements[0]?.distance?.value || 0;
+            response.data.routes[0]?.legs[0]?.distance?.value || 0;
 
         return distanceMeters / 1000;
     } catch (error){
