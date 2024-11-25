@@ -1,11 +1,13 @@
 import express from "express";
 import sequelize from "./database/config";
 import driverRoutes from "./routes/driverRoutes";
+import tripRoutes from "./routes/tripRoutes";
 
 const app = express();
 app.use(express.json());
 
 app.use("/drivers", driverRoutes);
+app.use("/ride", tripRoutes);
 
 const databaseStart = async () => {
     try{

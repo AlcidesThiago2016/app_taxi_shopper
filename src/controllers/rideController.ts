@@ -9,10 +9,20 @@ const calculaRideCost = (distance: number): number => {
 };
 
 export const estimateRide = async (req: any, res: any): Promise<void> => {
-    const { origin, destination } = req.body;
+    const { origin, destination, customerId } = req.body;
 
     if ( !origin || !destination) {
         res.status(400).json({error: "Origem e Destino devem ser preenchidos."});
+        return;
+    }
+
+    if (!customerId) {
+        res.status(400).json({error: "O ID do usuário é obrigatório."});
+        return;
+    }
+
+    if (origin === destination) {
+        res.status(400).json({ error: "Os endereços de origem e destino não podem ser iguais." });
         return;
     }
 
@@ -29,10 +39,11 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
         res.json({
             origin,
             destination,
+            customerId,
             distance: `${distance.toFixed(2)} km`,
             cost: `${rideCost.toFixed(2)}`
         });
     } catch (error) {
-        res.status(500).json({error: "."})
+        res.status(500).json({error})
     }
 }
