@@ -11,7 +11,7 @@ const databaseStart = async () => {
     try{
         await sequelize.authenticate();
         console.log("Conexão realizada com sucesso.");
-        await sequelize.sync({ force: true });
+        await sequelize.sync();
         console.log("Banco de Dados sincronizado com sucesso!");
 
         const PORT = process.env.PORT || 3000;

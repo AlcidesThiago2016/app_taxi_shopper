@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Driver from "../models/driver";
+import Driver from "../models/Driver";
 
 //Create Driver
 export const driverCreate = async (req: Request, res: Response) => {
@@ -8,7 +8,7 @@ export const driverCreate = async (req: Request, res: Response) => {
         const driver = await Driver.create({ name, description, car, rating, rate, minKm});
         res.status(201).json(driver);
     } catch (error) {
-        res.status(500).json({error})
+        res.status(500).json({error:"Motorista incluído com sucesso!"})
     }
 };
 

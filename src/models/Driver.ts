@@ -6,7 +6,7 @@ class Driver extends Model {
     public name!: string;
     public description!: string;
     public car!: string;
-    public rating!: number;
+    public rating!: string;
     public rate!: number;
     public minKm!: number;
 }
@@ -31,9 +31,8 @@ Driver.init(
             allowNull: false
         },
         rating: {
-            type: DataTypes.FLOAT,
+            type: DataTypes.STRING,
             allowNull: false,
-            defaultValue: 0
         },
         rate: {
             type: DataTypes.FLOAT,
