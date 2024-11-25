@@ -1,39 +1,38 @@
-const calDistance = (origin: string, destination: string): number => {
-    const distances : {[key: string]: number} = {
-        'São Paulo - Rio de Janeiro': 430,
-        'São Paulo - Belo Horizonte': 590,
-        'Rio de Janeiro - Belo Horizonte': 440,
-    };
-    return distances[`${origin} - ${destination}`] || distances[`${destination} - ${origin}`] || 0;
-};
+import { getDistanceGoogleMaps } from "../utils/googleMaps";
 
-const calTripCost = (distance: number): number => {
+const GOOGLE_MAPS_API_KEY = "AIzaSyARnnPHNtPul1RoSM1k3ipDdrbnxeI1xsQ";
+
+const calculaRideCost = (distance: number): number => {
     const baseFare = 5;
     const perKm = 2;
     return baseFare + distance * perKm;
 };
 
-export const estimateRide = (req: any, res: any): void => {
+export const estimateRide = async (req: any, res: any): Promise<void> => {
     const { origin, destination } = req.body;
 
-    if (!origin || !destination) {
-        res.status(400).json({error: 'Origem e destino são obrigatórios!' });
+    if ( !origin || !destination) {
+        res.status(400).json({error: "Origem e Destino devem ser preenchidos."});
         return;
     }
 
-    const distance = calDistance(origin, destination);
+    try {
+        const distance = await getDistanceGoogleMaps(origin, destination, GOOGLE_MAPS_API_KEY);
 
-    if(distance === 0) {
-        res.status(404).json({error: 'Rota não encontrada ou inválida!' });
-        return;
+        if (distance === 0) {
+            res.status(404).json({error: "Rota não encontrada ou inválida "});
+            return;
+        }
+
+        const rideCost = calculaRideCost(distance);
+
+        res.json({
+            origin,
+            destination,
+            distance: `${distance.toFixed(2)} km`,
+            cost: `${rideCost.toFixed(2)}`
+        });
+    } catch (error) {
+        res.status(500).json({error: "."})
     }
-
-    const tripCost = calTripCost(distance);
-
-    res.json({
-        origin,
-        destination,
-        distance: `${distance} km`,
-        cost: `${tripCost.toFixed(2)}`
-    });
-};
+}
