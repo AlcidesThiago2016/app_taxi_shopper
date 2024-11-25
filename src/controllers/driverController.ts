@@ -8,7 +8,7 @@ export const driverCreate = async (req: Request, res: Response) => {
         const driver = await Driver.create({ name, description, car, rating, rate, minKm});
         res.status(201).json(driver);
     } catch (error) {
-        res.status(500).json({error: "Motorista não criado!"})
+        res.status(500).json({error})
     }
 };
 

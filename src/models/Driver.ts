@@ -3,7 +3,7 @@ import sequelize from "../database/config";
 
 class Driver extends Model {
     public id!: number;
-    public nome!: string;
+    public name!: string;
     public description!: string;
     public car!: string;
     public rating!: number;
@@ -18,7 +18,7 @@ Driver.init(
             autoIncrement: true,
             primaryKey: true
         },
-        nome: {
+        name: {
             type: DataTypes.STRING,
             allowNull: false
         },
