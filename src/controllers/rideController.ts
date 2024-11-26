@@ -1,5 +1,6 @@
 import { getDistanceGoogleMaps } from "../utils/googleMaps";
 import Driver from "../models/Driver";
+import { Op } from "sequelize";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyARnnPHNtPul1RoSM1k3ipDdrbnxeI1xsQ";
 
@@ -39,7 +40,7 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
         const drivers = await Driver.findAll({
             where: {
                 minKm: {
-                    $lte: distance, // Retorna os motoristas que aceitam a viagem com no minimo da distancia calculada
+                    [Op.lte]: distance, // Retorna os motoristas que aceitam a viagem com no minimo da distancia calculada
                 },
             },
         });
