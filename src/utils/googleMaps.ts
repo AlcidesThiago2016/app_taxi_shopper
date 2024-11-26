@@ -2,11 +2,17 @@ import { Client } from "@googlemaps/google-maps-services-js";
 
 const client = new Client({});
 
-export const getDistanceGoogleMaps = async (
+export const getRouteFromGoogleMaps = async (
     origin: string,
     destination: string,
     apiKey: string
-): Promise<number> => {
+): Promise<{
+    distance: number; // Em km
+    duration: number; // Em seg
+    startLocation: { latitude: number; longitude: number };
+    endLocation: { latitude: number; longitude: number };
+    googleResponse: any; // Resposta orig do Google
+}> => {
     try {
         const response = await client.directions({
             params: {
@@ -16,12 +22,27 @@ export const getDistanceGoogleMaps = async (
             },
         });
 
-        const distanceMeters = 
-            response.data.routes[0]?.legs[0]?.distance?.value || 0;
+        const leg = response.data.routes[0]?.legs[0];
+        if (!leg) throw new Error("Rota não encontrada.");
 
-        return distanceMeters / 1000;
-    } catch (error){
-        console.log("Não foi possível obter a distância do Google Maps: ", error);
-        throw new Error("Não foi possível calcular a distância. Revise os dados fornecedos.")
+        const distanceInMeters = leg.distance?.value || 0;
+        const durationInSeconds = leg.duration?.value || 0;
+
+        return {
+            distance: distanceInMeters / 1000, // Converte metros para quilômetros
+            duration: durationInSeconds,
+            startLocation: {
+                latitude: leg.start_location.lat,
+                longitude: leg.start_location.lng,
+            },
+            endLocation: {
+                latitude: leg.end_location.lat,
+                longitude: leg.end_location.lng,
+            },
+            googleResponse: response.data, // Resposta completa do Google
+        };
+    } catch (error) {
+        console.error("Erro ao obter rota do Google Maps:", error);
+        throw new Error("Falha ao calcular a rota. Verifique os dados fornecidos.");
     }
-}
+};

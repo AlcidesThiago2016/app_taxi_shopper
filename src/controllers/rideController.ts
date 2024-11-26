@@ -1,4 +1,4 @@
-import { getDistanceGoogleMaps } from "../utils/googleMaps";
+import { getRouteFromGoogleMaps } from "../utils/googleMaps";
 import Driver from "../models/Driver";
 import { Op } from "sequelize";
 
@@ -9,7 +9,7 @@ const calculaRideCost = (distance: number, rate: number): number => {
 };
 
 export const estimateRide = async (req: any, res: any): Promise<void> => {
-    const { origin, destination, customerId } = req.body;
+    const {  customer_id ,origin, destination} = req.body;
 
     // Validações api
     if ( !origin || !destination) {
@@ -17,7 +17,7 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
         return;
     }
 
-    if (!customerId) {
+    if (!customer_id) {
         res.status(400).json({error: "O ID do usuário é obrigatório."});
         return;
     }
@@ -28,10 +28,13 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
     }
 
     try {
-        // Captura a distancia da rota
-        const distance = await getDistanceGoogleMaps(origin, destination, GOOGLE_MAPS_API_KEY);
+        // Busca a rota com o detalhes do Google Maps
+        const routeDetails = await getRouteFromGoogleMaps(origin, destination, GOOGLE_MAPS_API_KEY);
 
-        if (distance === 0) {
+        // Extração de informações da rota
+        const {distance: routeDistance, duration:routeDuration, startLocation, endLocation} = routeDetails;
+
+        if (routeDistance === 0) {
             res.status(404).json({error: "Rota não encontrada ou inválida "});
             return;
         }
@@ -40,7 +43,7 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
         const drivers = await Driver.findAll({
             where: {
                 minKm: {
-                    [Op.lte]: distance, // Retorna os motoristas que aceitam a viagem com no minimo da distancia calculada
+                    [Op.lte]: routeDistance, // Retorna os motoristas que aceitam a viagem com no minimo da distancia calculada
                 },
             },
         });
@@ -52,19 +55,32 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
 
         // Faz o calculo do custo da viagem de cada motorista
         const driverOptions = drivers.map((driver) => ({
-            driverId: driver.id,
+            id: driver.id,
             name: driver.name,
-            car: driver.car,
-            rating: driver.rating,
-            cost: `R$ ${calculaRideCost(distance, driver.rate).toFixed(2)}`,
-        }));
+            description: driver.description,
+            vehicle: driver.vehicle,
+            review: {
+                rating: driver.rating,
+                comment: `Excelente avaliação de ${driver.name}`
+            },
+            value: calculaRideCost(routeDistance, driver.value),
+        }))
+        .sort((a, b) => a.value - b.value); // Faz a ordenação do mais barato
 
         // Faz o Retorno do resultado
         res.json({
-            origin,
-            destination,
-            distance: `${distance.toFixed(2)} km`,
-            availableDrivers: driverOptions,
+            origin: {
+                latitude: startLocation.latitude,
+                longitude: startLocation.longitude,
+            },
+            destination: {
+                latitude: endLocation.latitude,
+                longitude: endLocation.longitude,
+            },
+            distance: routeDistance,
+            duration: `${Math.ceil(routeDuration / 60)} min`, // Conversao do tempo para minutos
+            options: driverOptions,
+            routeResponse: routeDetails.googleResponse, // Retorna a resposta original do Google
         });
     } catch (error) {
         res.status(500).json({error})

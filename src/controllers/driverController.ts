@@ -4,8 +4,8 @@ import Driver from "../models/Driver";
 //Create Driver
 export const driverCreate = async (req: Request, res: Response) => {
     try {
-        const { name, description, car, rating, rate, minKm } = req.body;
-        const driver = await Driver.create({ name, description, car, rating, rate, minKm});
+        const { name, description, vehicle, rating, value, minKm } = req.body;
+        const driver = await Driver.create({ name, description, vehicle, rating, value, minKm});
         res.status(201).json(driver);
     } catch (error) {
         res.status(500).json({error:"Motorista incluído com sucesso!"})
@@ -41,13 +41,13 @@ export const getDriversId = async (req: Request, res: Response) => {
 export const updateDriver = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { name, description, car, rating, rate, minKm } = req.body;
+        const { name, description, vehicle, rating, value, minKm } = req.body;
         const driver = await Driver.findByPk(id);
 
         if (!driver) {
             res.status(404).json({error: "Motorista não localizado."})
         } else {
-            await driver.update({name, description, car, rating, rate, minKm});
+            await driver.update({name, description, vehicle, rating, value, minKm});
             res.json(driver);
         }
     } catch (error) {
