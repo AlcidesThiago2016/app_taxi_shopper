@@ -59,15 +59,12 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
             name: driver.name,
             description: driver.description,
             vehicle: driver.vehicle,
-            review: {
-                rating: driver.rating,
-                comment: `Excelente avaliação de ${driver.name}`
-            },
+            review: driver.review,
             value: calculaRideCost(routeDistance, driver.value),
         }))
         .sort((a, b) => a.value - b.value); // Faz a ordenação do mais barato
 
-        // Responsável pela transformação do routeResponse em Objeto
+        // Retorna o objeto formatado do google Response
         const routeResponse = {
             startAddress: googleResponse.routes[0]?.legs[0]?.start_address,
             endAddress: googleResponse.routes[0]?.legs[0]?.end_address,
