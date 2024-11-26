@@ -3,22 +3,26 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon src/index.ts",
     "build": "tsc",
-    "star": "node dist/server.js"
+    "star": "node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.4.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.9.3",
     "express": "^4.21.1",
+    "sequelize": "^6.37.5",
+    "sqlite3": "^5.1.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
+    "@types/sequelize": "^4.28.20",
     "eslint": "^8.57.1",
     "nodemon": "^3.1.7",
     "prettier": "^3.3.3"
