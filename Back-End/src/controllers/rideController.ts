@@ -1,5 +1,6 @@
 import { getRouteFromGoogleMaps } from "../utils/googleMaps";
 import Driver from "../models/Driver";
+import Ride from "../models/Ride";
 import { Op } from "sequelize";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyARnnPHNtPul1RoSM1k3ipDdrbnxeI1xsQ";
@@ -94,3 +95,4 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
         res.status(500).json({error})
     }
 }
+
