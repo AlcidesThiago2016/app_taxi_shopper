@@ -1,14 +1,23 @@
 import { Request, Response } from "express";
 import Driver from "../models/Driver";
+import { handleValidationError } from "../utils/errorHandler";
 
 //Create Driver
 export const driverCreate = async (req: Request, res: Response) => {
     try {
         const { name, description, vehicle, review, value, minKm } = req.body;
+
+        if (!name || !description || !vehicle || !review || !value || !minKm){
+            handleValidationError(res, "Os dados fornecidos no corpo da requisição são inválidos");
+            return;
+        }
         const driver = await Driver.create({ name, description, vehicle, review, value, minKm});
         res.status(201).json(driver);
     } catch (error) {
-        res.status(500).json({error:"Motorista incluído com sucesso!"})
+        res.status(500).json({
+            error_code: "SERVER_ERROR",
+            error_description: "Erro ao criar na criação do motorista!."
+        })
     }
 };
 
