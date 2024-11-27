@@ -146,6 +146,14 @@ export const ridesByCustomer = async (req: Request, res: Response): Promise<void
             ],
         });
 
+        if (!rides || rides.length === 0){
+            res.status(404).json({
+                error_code: "NO_RIDES_FOUND",
+                error_description: "Nenhum registro encontrado",
+            });
+            return;
+        }
+
         const format = rides.map((ride: any) => ({
             id: ride.id,
             date: ride.createdAt,
