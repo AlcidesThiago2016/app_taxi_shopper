@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../database/config";
+import Driver from "./Driver";
 
 class Ride extends Model {
     public id!: number;
@@ -11,6 +12,7 @@ class Ride extends Model {
     public cost!: number;
     public duration!: string;
     public createdAt!: Date;
+    public updatedAt!: Date;
 }
 
 Ride.init(
@@ -48,11 +50,21 @@ Ride.init(
             type: DataTypes.STRING,
             allowNull: true,
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        updatedAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
     },
     {
         sequelize,
         tableName: "rides",
     }
 );
+
+Ride.belongsTo(Driver, { foreignKey: "driverId"});
 
 export default Ride;
