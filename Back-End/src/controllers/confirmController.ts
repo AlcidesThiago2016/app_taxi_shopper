@@ -4,7 +4,7 @@ import Driver from "../models/Driver";
 
 export const confirmRide = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { userId, origin, destination, driverId, distance, cost } = req.body;
+        const { customerId, origin, destination, driverId, distance, cost } = req.body;
 
         if (!origin || !destination) {
             res.status(400).json({
@@ -40,7 +40,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
         }
 
         await Ride.create({
-            userId,
+            customerId,
             origin,
             destination,
             driverId,
