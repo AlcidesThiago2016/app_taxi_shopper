@@ -4,57 +4,78 @@ import Driver from "../models/Driver";
 
 export const confirmRide = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { customerId, origin, destination, driverId, distance, cost } = req.body;
+        const { customer_id, origin, destination, distance, duration, driver, value } = req.body;
 
+        // Validações
         if (!origin || !destination) {
             res.status(400).json({
                 error_code: "INVALID_DATA",
-                error_description: "Endereço Origem e Destino são obrigatórios."
+                error_description: "Os endereços de origem e destino são obrigatórios.",
             });
             return;
         }
 
-        if (!driverId) {
+        if (!customer_id) {
             res.status(400).json({
                 error_code: "INVALID_DATA",
-                error_description: "Necessário um motorista."
+                error_description: "O ID do cliente não pode estar em branco.",
             });
             return;
         }
 
-        const driver = await Driver.findByPk(driverId);
-        if (!driver) {
+        if (origin === destination) {
             res.status(400).json({
                 error_code: "INVALID_DATA",
-                error_description: "O motorista selecionado não é válido."
+                error_description: "Os endereços de origem e destino não podem ser iguais.",
             });
             return;
         }
 
-        if (distance < driver.minKm) {
+        if (!driver || !driver.id || !driver.name) {
             res.status(400).json({
                 error_code: "INVALID_DATA",
-                error_description: `A quilometragem informada está abaixo do limite mínimo aceito pelo motorista (${driver.minKm} km).`,
+                error_description: "Os dados do motorista devem ser informados e válidos.",
             });
             return;
         }
 
+        // Verifica se o motorista informado é válido
+        const validDriver = await Driver.findByPk(driver.id);
+        if (!validDriver) {
+            res.status(400).json({
+                error_code: "INVALID_DATA",
+                error_description: "O motorista selecionado não é válido.",
+            });
+            return;
+        }
+
+        // Verifica se a distância é válida para o motorista selecionado
+        if (distance < validDriver.minKm) {
+            res.status(400).json({
+                error_code: "INVALID_DATA",
+                error_description: `A quilometragem informada está abaixo do limite mínimo aceito pelo motorista (${validDriver.minKm} km).`,
+            });
+            return;
+        }
+
+        // Salva a viagem no banco de dados
         await Ride.create({
-            customerId,
+            userId: customer_id,
             origin,
             destination,
-            driverId,
+            driverId: driver.id,
             distance,
-            cost,
+            cost: value,
         });
 
+        // Retorna sucesso
         res.status(200).json({
-            message: "Viagem confirmada com sucesso."
+            message: "Viagem confirmada com sucesso.",
         });
-    }catch (error) {
+    } catch (error) {
         res.status(500).json({
             error_code: "SERVER_ERROR",
             error_description: "Erro ao confirmar a viagem.",
         });
     }
-}
+};
