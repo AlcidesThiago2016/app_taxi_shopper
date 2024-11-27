@@ -6,7 +6,10 @@ class Driver extends Model {
     public name!: string;
     public description!: string;
     public vehicle!: string;
-    public rating!: string;
+    public review!: {
+        rating: number;
+        comment: string;
+    };
     public value!: number;
     public minKm!: number;
 }
@@ -30,8 +33,8 @@ Driver.init(
             type: DataTypes.STRING,
             allowNull: false
         },
-        rating: {
-            type: DataTypes.STRING,
+        review: {
+            type: DataTypes.JSON,
             allowNull: false,
         },
         value: {

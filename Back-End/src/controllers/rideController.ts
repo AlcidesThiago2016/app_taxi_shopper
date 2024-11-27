@@ -1,5 +1,6 @@
 import { getRouteFromGoogleMaps } from "../utils/googleMaps";
 import Driver from "../models/Driver";
+import Ride from "../models/Ride";
 import { Op } from "sequelize";
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyARnnPHNtPul1RoSM1k3ipDdrbnxeI1xsQ";
@@ -32,7 +33,7 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
         const routeDetails = await getRouteFromGoogleMaps(origin, destination, GOOGLE_MAPS_API_KEY);
 
         // Extração de informações da rota
-        const {distance: routeDistance, duration:routeDuration, startLocation, endLocation} = routeDetails;
+        const {distance: routeDistance, duration:routeDuration, startLocation, endLocation, googleResponse} = routeDetails;
 
         if (routeDistance === 0) {
             res.status(404).json({error: "Rota não encontrada ou inválida "});
@@ -59,13 +60,21 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
             name: driver.name,
             description: driver.description,
             vehicle: driver.vehicle,
-            review: {
-                rating: driver.rating,
-                comment: `Excelente avaliação de ${driver.name}`
-            },
+            review: driver.review,
             value: calculaRideCost(routeDistance, driver.value),
         }))
         .sort((a, b) => a.value - b.value); // Faz a ordenação do mais barato
+
+        // Retorna o objeto formatado do google Response
+        const routeResponse = {
+            startAddress: googleResponse.routes[0]?.legs[0]?.start_address,
+            endAddress: googleResponse.routes[0]?.legs[0]?.end_address,
+            steps: googleResponse.routes[0]?.legs[0]?.steps.map((step: any) => ({
+                instructions: step.html_instructions,
+                distance: step.distance.text,
+                duration: step.duration.text,
+            })),
+        };
 
         // Faz o Retorno do resultado
         res.json({
@@ -80,9 +89,10 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
             distance: routeDistance,
             duration: `${Math.ceil(routeDuration / 60)} min`, // Conversao do tempo para minutos
             options: driverOptions,
-            routeResponse: routeDetails.googleResponse, // Retorna a resposta original do Google
+            routeResponse,
         });
     } catch (error) {
         res.status(500).json({error})
     }
 }
+
