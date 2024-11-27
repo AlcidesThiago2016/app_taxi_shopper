@@ -26,7 +26,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
         if (origin === destination) {
             res.status(400).json({
                 error_code: "INVALID_DATA",
-                error_description: "Os endereços de origem e destino não podem ser iguais.",
+                error_description: "Os dados fornecidos no corpo da requisição são inválidos.",
             });
             return;
         }
@@ -34,7 +34,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
         if (!driver || !driver.id || !driver.name) {
             res.status(400).json({
                 error_code: "INVALID_DATA",
-                error_description: "Os dados do motorista devem ser informados e válidos.",
+                error_description: "Os dados fornecidos no corpo da requisição são inválidos.",
             });
             return;
         }
@@ -42,18 +42,18 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
         // Verifica se o motorista informado é válido
         const validDriver = await Driver.findByPk(driver.id);
         if (!validDriver) {
-            res.status(400).json({
-                error_code: "INVALID_DATA",
-                error_description: "O motorista selecionado não é válido.",
+            res.status(404).json({
+                error_code: "DRIVER_NOT_FOUND",
+                error_description: "Motorista não encontrado",
             });
             return;
         }
 
         // Verifica se a distância é válida para o motorista selecionado
         if (distance < validDriver.minKm) {
-            res.status(400).json({
-                error_code: "INVALID_DATA",
-                error_description: `A quilometragem informada está abaixo do limite mínimo aceito pelo motorista (${validDriver.minKm} km).`,
+            res.status(406).json({
+                error_code: "INVALID_DISTANCE",
+                error_description: "Quilometragem inválida para o motorista",
             });
             return;
         }
@@ -70,7 +70,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
 
         // Retorna sucesso
         res.status(200).json({
-            message: "Viagem confirmada com sucesso.",
+            success: true,
         });
     } catch (error) {
         res.status(500).json({
