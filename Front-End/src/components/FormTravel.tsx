@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import { estimateRide } from "../api/api";
 
 interface Props {
-    onEstimate: (data: any) => void;
+    onEstimate: (data: unknown) => void;
     onError: (error: string) => void;
 }
 
@@ -13,16 +14,9 @@ const FormTravel: React.FC<Props> = ({onEstimate, onError }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:3000/ride/estimate", {
-                method: "POST",
-                headers: {"Content-type": "application/json"},
-                body: JSON.stringify({ customer_id: userId, origin, destination}),
-            });
-
-            if (!response.ok) throw new Error("Não foi possível estimar a viagem.");
-
-            const data = await response.json();
+            const data = await estimateRide(userId, origin, destination);
             onEstimate(data);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             onError("Não foi possível fazer o calculo da estimativa, tente novamente.")
         }
