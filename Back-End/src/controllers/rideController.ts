@@ -49,6 +49,8 @@ export const estimateRide = async (req: any, res: any): Promise<void> => {
             },
         });
 
+        console.log("Motoristas encontrados:", drivers);
+
         if (drivers.length === 0){
             res.status(404).json({error: "Nenhum motorista esta disponível para a distância solicitada."});
             return;

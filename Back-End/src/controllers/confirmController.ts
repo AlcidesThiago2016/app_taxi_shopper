@@ -6,6 +6,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
     try {
         const { customer_id, origin, destination, distance, duration, driver, value } = req.body;
 
+        console.log("DISTANCIA:" ,distance)
         // Validações
         if (!origin || !destination) {
             res.status(400).json({
@@ -59,7 +60,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
         }
 
         // Salva a viagem no banco de dados
-        await Ride.create({
+        const ride = await Ride.create({
             userId: customer_id,
             origin,
             destination,
@@ -72,6 +73,22 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
         // Retorna sucesso
         res.status(200).json({
             success: true,
+            customer_id,
+            rides: [
+                {
+                    id: ride.id,
+                    date: ride.createdAt,
+                    origin: ride.origin,
+                    destination: ride.destination,
+                    distance: ride.distance,
+                    duration: ride.duration,
+                    driver: {
+                        id: validDriver.id,
+                        name: validDriver.name,
+                    },
+                    value: ride.cost,
+                },
+            ],
         });
     } catch (error) {
         res.status(500).json({
@@ -128,6 +145,14 @@ export const ridesByCustomer = async (req: Request, res: Response): Promise<void
                 },
             ],
         });
+
+        if (!rides || rides.length === 0){
+            res.status(404).json({
+                error_code: "NO_RIDES_FOUND",
+                error_description: "Nenhum registro encontrado",
+            });
+            return;
+        }
 
         const format = rides.map((ride: any) => ({
             id: ride.id,
