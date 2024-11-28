@@ -7,7 +7,6 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
         const { customer_id, origin, destination, distance, duration, driver, value } = req.body;
 
         console.log("DISTANCIA:" ,distance)
-        // Validações
         if (!origin || !destination) {
             res.status(400).json({
                 error_code: "INVALID_DATA",
@@ -40,7 +39,6 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
             return;
         }
 
-        // Verifica se o motorista informado é válido
         const validDriver = await Driver.findByPk(driver.id);
         if (!validDriver) {
             res.status(404).json({
@@ -50,7 +48,6 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
             return;
         }
 
-        // Verifica se a distância é válida para o motorista selecionado
         if (distance < validDriver.minKm) {
             res.status(406).json({
                 error_code: "INVALID_DISTANCE",
@@ -59,7 +56,6 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
             return;
         }
 
-        // Salva a viagem no banco de dados
         const ride = await Ride.create({
             userId: customer_id,
             origin,
@@ -70,7 +66,6 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
             duration
         });
 
-        // Retorna sucesso
         res.status(200).json({
             success: true,
             customer_id,
@@ -98,7 +93,6 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
     }
 };
 
-// Lista Viagens do Cliente 
 
 export const ridesByCustomer = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -125,16 +119,13 @@ export const ridesByCustomer = async (req: Request, res: Response): Promise<void
             }
         }
 
-        // Filtro base: viagens realizadas pelo usuário
         const filter: any = { userId: customer_id };
         
 
-        // Adiciona filtro por motorista, se informado
         if (driver_id) {
             filter.driverId = driver_id;
         }
 
-        // Busca as viagens realizadas, ordenando da mais recente para a mais antiga
         const rides = await Ride.findAll({
             where: filter,
             order: [["createdAt", "DESC"]],
@@ -168,7 +159,6 @@ export const ridesByCustomer = async (req: Request, res: Response): Promise<void
             value: ride.cost,
         }));
 
-        // Retorna a lista de viagens
         res.status(200).json({
             customer_id,
             rides: format,

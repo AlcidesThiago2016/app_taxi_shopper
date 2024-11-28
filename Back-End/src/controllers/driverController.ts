@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import Driver from "../models/Driver";
 import { handleValidationError } from "../utils/errorHandler";
 
-//Create Driver
 export const driverCreate = async (req: Request, res: Response) => {
     try {
         const { name, description, vehicle, review, value, minKm } = req.body;
@@ -21,7 +20,6 @@ export const driverCreate = async (req: Request, res: Response) => {
     }
 };
 
-//Search Drivers
 export const getDrivers = async (_req: Request, res: Response) => {
     try {
         const drivers = await Driver.findAll();
@@ -31,7 +29,6 @@ export const getDrivers = async (_req: Request, res: Response) => {
     }
 };
 
-//Search Driver put ID
 export const getDriversId = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -46,7 +43,6 @@ export const getDriversId = async (req: Request, res: Response) => {
     }
 };
 
-//Update Driver
 export const updateDriver = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -64,7 +60,6 @@ export const updateDriver = async (req: Request, res: Response) => {
     }
 };
 
-//Delete Driver
 export const deleteDriver = async ( req: Request, res: Response) => {
     try {
         const { id } = req.params;
