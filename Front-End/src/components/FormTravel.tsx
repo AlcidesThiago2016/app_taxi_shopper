@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { estimateRide } from "../api/api";
 
 interface Props {
-    onEstimate: (data: any) => void;
+    onEstimate: (data: unknown) => void;
     onError: (error: string) => void;
 }
 
@@ -16,6 +16,7 @@ const FormTravel: React.FC<Props> = ({onEstimate, onError }) => {
         try {
             const data = await estimateRide(userId, origin, destination);
             onEstimate(data);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             onError("Não foi possível fazer o calculo da estimativa, tente novamente.")
         }

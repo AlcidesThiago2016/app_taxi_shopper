@@ -1,29 +1,18 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
+import OptionsTravel from "../components/OptionsTravel";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 
-interface Option {
-    id: number;
-    name: string;
-    description: string;
-    vehicle: string;
-    review: { rating: number };
-    value: number;
-}
-
-const TravelOptionsPage: React.FC = () => {
-    const [customerId] = useState("123"); // Simulação para teste
-    const [origin] = useState("Av. Paulista, São Paulo, SP"); // Simulação para teste
-    const [destination] = useState("Praça da Sé, São Paulo, SP"); // Simulação para teste
+const PtravelOptions: React.FC = () => {
+    const [customerId] = useState("123"); // Simulação
+    const [origin] = useState("Av. Paulista, São Paulo, SP");
+    const [destination] = useState("Praça da Sé, São Paulo, SP");
     const [distance, setDistance] = useState<number | null>(null);
     const [duration, setDuration] = useState<string | null>(null);
-    const [options, setOptions] = useState<Option[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
+    const [options, setOptions] = useState([]);
     const navigate = useNavigate();
 
-    // Carrega as opções de viagem do BackEnd
     useEffect(() => {
         const fetchTravelOptions = async () => {
             try {
@@ -33,24 +22,19 @@ const TravelOptionsPage: React.FC = () => {
                     destination,
                 });
 
-                // Atualiza estado com os dados retornados do BackEnd
                 const { distance, duration, options } = response.data;
                 setDistance(distance);
                 setDuration(duration);
                 setOptions(options);
-                setLoading(false);
             } catch (err) {
-                console.error("Erro ao buscar estimativa de viagem:", err);
-                setError("Não foi possível carregar as opções de viagem. Tente novamente.");
-                setLoading(false);
+                console.error("Erro ao carregar opções de viagem:", err);
             }
         };
 
         fetchTravelOptions();
     }, [customerId, origin, destination]);
 
-    // Confirma a viagem com o motorista selecionado
-    const handleSelect = async (option: Option) => {
+    const handleSelect = async (option: any) => {
         try {
             const payload = {
                 customer_id: customerId,
@@ -63,56 +47,36 @@ const TravelOptionsPage: React.FC = () => {
                     name: option.name,
                 },
                 value: option.value,
+                onSelect:{handleSelect},
             };
 
-            console.log("Enviando payload para confirmação:", payload);
+            console.log("Confirmando a viagem com:", payload);
 
             await api.patch("/ride/confirm", payload);
 
             navigate("/history");
         } catch (err) {
             console.error("Erro ao confirmar a viagem:", err);
-            alert("Erro ao confirmar a viagem. Verifique os dados e tente novamente.");
+            alert("Erro ao confirmar a viagem. Tente novamente.");
         }
     };
-
-    if (loading) {
-        return <p>Carregando opções de viagem...</p>;
-    }
-
-    if (error) {
-        return <p style={{ color: "red" }}>{error}</p>;
-    }
 
     return (
         <div>
             <h1>Opções de Viagem</h1>
-            <h2>Detalhes da Viagem</h2>
-            <p>ID do Cliente: {customerId}</p>
-            <p>Origem: {origin}</p>
-            <p>Destino: {destination}</p>
             {distance && duration && (
-                <>
-                    <p>Distância: {distance} km</p>
-                    <p>Duração: {duration}</p>
-                </>
+                <OptionsTravel
+                    customerId={customerId}
+                    origin={origin}
+                    destination={destination}
+                    distance={distance}
+                    duration={duration}
+                    options={options}
+                    onSelect={handleSelect} // Passa a função para confirmar a viagem
+                />
             )}
-
-            <h3>Motoristas Disponíveis</h3>
-            <ul>
-                {options.map((option) => (
-                    <li key={option.id}>
-                        <h4>{option.name}</h4>
-                        <p>{option.description}</p>
-                        <p>Veículo: {option.vehicle}</p>
-                        <p>Avaliação: {option.review.rating}</p>
-                        <p>Valor: R$ {option.value.toFixed(2)}</p>
-                        <button onClick={() => handleSelect(option)}>Escolher</button>
-                    </li>
-                ))}
-            </ul>
         </div>
     );
 };
 
-export default TravelOptionsPage;
+export default PtravelOptions;

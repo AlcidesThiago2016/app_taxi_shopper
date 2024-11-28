@@ -10,7 +10,7 @@ export const estimateRide = async (customer_id: string, origin: string, destinat
     return response.data;
 };
 
-export const confirmRide = async (data: any) => {
+export const confirmRide = async (data: unknown) => {
     const response = await api.patch("/ride/confirm", data);
     return response.data;
 };

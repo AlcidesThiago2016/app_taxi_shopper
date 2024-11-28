@@ -16,7 +16,7 @@ interface Props {
     distance: number;
     duration: string;
     options: Option[];
-    onSelect: (option: Option) => void;
+    onSelect: (option: Option) => void; // Função passada pelo componente pai para confirmar a viagem
 }
 
 const OptionsTravel: React.FC<Props> = ({
@@ -28,12 +28,13 @@ const OptionsTravel: React.FC<Props> = ({
     options,
     onSelect,
 }) => {
+    console.log("Propriedade onSelect recebida no filho:", onSelect);
     return (
         <div>
             <h2>Detalhes da Viagem</h2>
             <p>ID do Cliente: {customerId}</p>
-            <p>Origem: {origin}</p>
-            <p>Destino: {destination}</p>
+            <p>Origem: {JSON.stringify(origin)}</p>
+            <p>Destino: {JSON.stringify(destination)}</p>
             <p>Distância: {distance} km</p>
             <p>Duração: {duration}</p>
 
@@ -55,3 +56,4 @@ const OptionsTravel: React.FC<Props> = ({
 };
 
 export default OptionsTravel;
+
