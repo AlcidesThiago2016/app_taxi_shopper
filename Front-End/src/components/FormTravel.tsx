@@ -16,7 +16,7 @@ const FormTravel: React.FC<Props> = ({onEstimate, onError }) => {
         try {
             const data = await estimateRide(userId, origin, destination);
             onEstimate(data);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        
         } catch (error) {
             onError("Não foi possível fazer o calculo da estimativa, tente novamente.")
         }

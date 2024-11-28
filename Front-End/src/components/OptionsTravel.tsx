@@ -16,7 +16,7 @@ interface Props {
     distance: number;
     duration: string;
     options: Option[];
-    onSelect: (option: Option) => void; // Função passada pelo componente pai para confirmar a viagem
+    onSelect: (option: Option) => void; 
 }
 
 const OptionsTravel: React.FC<Props> = ({
