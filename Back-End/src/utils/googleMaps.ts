@@ -7,11 +7,11 @@ export const getRouteFromGoogleMaps = async (
     destination: string,
     apiKey: string
 ): Promise<{
-    distance: number; // Em km
-    duration: number; // Em seg
+    distance: number; 
+    duration: number; 
     startLocation: { latitude: number; longitude: number };
     endLocation: { latitude: number; longitude: number };
-    googleResponse: any; // Resposta orig do Google
+    googleResponse: any; 
 }> => {
     try {
         const response = await client.directions({
@@ -29,7 +29,7 @@ export const getRouteFromGoogleMaps = async (
         const durationInSeconds = leg.duration?.value || 0;
 
         return {
-            distance: distanceInMeters / 1000, // Converte metros para quilômetros
+            distance: distanceInMeters / 1000, 
             duration: durationInSeconds,
             startLocation: {
                 latitude: leg.start_location.lat,
@@ -39,7 +39,7 @@ export const getRouteFromGoogleMaps = async (
                 latitude: leg.end_location.lat,
                 longitude: leg.end_location.lng,
             },
-            googleResponse: response.data, // Resposta completa do Google
+            googleResponse: response.data, 
         };
     } catch (error) {
         console.error("Erro ao obter rota do Google Maps:", error);
